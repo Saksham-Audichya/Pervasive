@@ -2,13 +2,14 @@ package com.example.speedtracker
 
 import android.app.Service
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.IBinder
 import android.widget.Toast
-import androidx.core.app.ActivityCompat  // Add this import
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 
 class SpeedTrackingService : Service(), LocationListener {
 
@@ -25,6 +26,8 @@ class SpeedTrackingService : Service(), LocationListener {
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 1000, 5f, this
             )
+        } else {
+            Toast.makeText(this, "Location Permission Denied", Toast.LENGTH_SHORT).show()
         }
         return START_STICKY
     }
@@ -35,10 +38,11 @@ class SpeedTrackingService : Service(), LocationListener {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    // LocationListener method: called when a location update is received
     override fun onLocationChanged(location: Location) {
         previousLocation?.let {
             val speed = SpeedTrackingUtils.calculateSpeed(it, location)
-            showSpeed(speed)
+            broadcastSpeedAndLocation(speed, location)
         }
         previousLocation = location
     }
@@ -50,7 +54,17 @@ class SpeedTrackingService : Service(), LocationListener {
         return null
     }
 
-    private fun showSpeed(speed: Float) {
-        Toast.makeText(this, "Current Speed: $speed m/s", Toast.LENGTH_SHORT).show()
+    private fun broadcastSpeedAndLocation(speed: Float, location: Location) {
+        val intent = Intent("com.example.speedtracker.LOCATION_UPDATE")
+        intent.putExtra("speed", speed)
+        intent.putExtra("latitude", location.latitude)
+        intent.putExtra("longitude", location.longitude)
+        sendBroadcast(intent)
+    }
+
+    // Stop location updates when the service is destroyed
+    override fun onDestroy() {
+        super.onDestroy()
+        locationManager.removeUpdates(this)
     }
 }

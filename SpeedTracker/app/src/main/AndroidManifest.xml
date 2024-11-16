@@ -2,33 +2,33 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.speedtracker">
 
-    <!-- Declare permissions -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Permissions for location access -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
-    <!-- Use the feature tag to specify the app is a Wear OS app -->
+    <!-- Declare the feature for wearables -->
     <uses-feature android:name="android.hardware.type.watch" android:required="true" />
 
-    <!-- Declare the application -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.SpeedTracker">
 
-        <!-- Main activity as launcher -->
-        <activity android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:exported="true">
+        <!-- MainActivity with intent filter to launch the app -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Service declaration -->
+        <!-- SpeedTrackingService for background location tracking -->
         <service android:name=".SpeedTrackingService"
-            android:exported="false"/>
+            android:exported="true"/>
 
     </application>
 </manifest>
